@@ -1,6 +1,0 @@
-json_dto.py
-setup.py
-json_dto.egg-info/PKG-INFO
-json_dto.egg-info/SOURCES.txt
-json_dto.egg-info/dependency_links.txt
-json_dto.egg-info/top_level.txt
