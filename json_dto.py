@@ -144,9 +144,6 @@ class JsonDto:
         }
 
         def get_field_type(field: dataclasses.Field) -> dict:
-            # JsonDTO
-            # List[JsonDto] List[int]
-            # Dict[]
             if field.type in types_map:
                 return {'type': types_map.get(field.type)}
             elif isinstance(field.type, JsonDto):

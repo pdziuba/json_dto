@@ -2,7 +2,8 @@
 data
 __pycache__
 venv
-./main
+dist
+json_dto.egg-info
 
 # IDEs and editors
 /.idea
