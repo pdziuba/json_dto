@@ -1,3 +1,4 @@
+import dataclasses
 import enum
 from datetime import datetime
 from typing import get_type_hints
@@ -130,39 +131,66 @@ class JsonDto:
         )
 
     @classmethod
+    def get_schema_properties(cls):
+        types_map = {
+            int: 'integer',
+            float: 'number',
+            str: 'string',
+            bool: 'boolean',
+            datetime: 'string',
+            enum.Enum: 'string',
+            list: 'array',
+            dict: 'object'
+        }
+
+        def get_field_type(field: dataclasses.Field) -> dict:
+            # JsonDTO
+            # List[JsonDto] List[int]
+            # Dict[]
+            if field.type in types_map:
+                return {'type': types_map.get(field.type)}
+            elif isinstance(field.type, JsonDto):
+                return {'type': 'object', 'properties': field.type.get_schema_properties()}
+            elif is_generic_list(field.type):
+                generic_type = field.type.__args__[0]
+                if generic_type in types_map:
+                    return {'type': 'array', 'items': {'type': types_map[generic_type]}}
+                else:
+                    return {'type': 'array',
+                            'items': {'type': 'object', 'properties': generic_type.get_schema_properties()}}
+            elif is_generic_dict(field.type):
+                generic_type = field.type.__args__[1]
+                if generic_type in types_map:
+                    return {'type': 'object', 'additionalProperties': {'type': types_map[generic_type]}}
+                else:
+                    return {
+                        'type': 'object',
+                        'additionalProperties': {
+                            'type': 'object',
+                            'properties': generic_type.get_schema_properties(),
+                            'required': generic_type.get_schema_required()
+                        }
+                    }
+
+        return {
+            field.name: get_field_type(field) for field in dataclasses.fields(cls)
+        }
+
+    @classmethod
+    def get_schema_required(cls):
+        def is_required(field: dataclasses.Field) -> bool:
+            if field.default == dataclasses.MISSING:
+                return True
+
+        return [field.name for field in dataclasses.fields(cls) if is_required(field)]
+
+    @classmethod
     def get_json_schema(cls):
-        def type_hint_to_schema(type_):
-            if type_ == int:
-                return {
-                    "type": ["number", "null"]
-                }
-            if type_ == str:
-                return {
-                    "type": ["string", "null"]
-                }
-            if type_ == datetime:
-                return {
-                    "type": ["string", "null"]
-                }
-            if issubclass(type_, enum.Enum):
-                return {
-                    "type": ["string", "null"]
-                }
-            if issubclass(type_, JsonDto):
-                return {
-                    "$ref": type_.__name__
-                }
-            if issubclass(type_, list):
-                return {
-                    "type": ["array", "null"]
-                }
 
         return {
             "$schema": "http://json-schema.org/draft-04/schema#",
             "title": cls.__name__,
             "type": "object",
-            "properties": {
-                key: type_hint_to_schema(type_) for key, type_ in get_type_hints(cls).items()
-            },
-            "required": []
+            "properties": cls.get_schema_properties(),
+            "required": cls.get_schema_required()
         }
