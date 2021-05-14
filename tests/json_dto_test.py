@@ -89,7 +89,7 @@ class JsonDtoTest(TestCase):
                 'my_dict': {"type": "object"},
                 'my_float': {'type': 'number'},
                 'my_int': {'type': 'integer'},
-                'my_str': {'type': ['string', 'null']}
+                'my_str': {'type': 'string'}
             },
             "required": ["my_int", "my_str", "my_float"]
         }
@@ -126,7 +126,7 @@ class JsonDtoTest(TestCase):
                         'my_dict': {"type": "object"},
                         'my_float': {'type': 'number'},
                         'my_int': {'type': 'integer'},
-                        'my_str': {'type': ['string', 'null']}
+                        'my_str': {'type': 'string'}
                     }
                 }},
             },
@@ -167,7 +167,7 @@ class JsonDtoTest(TestCase):
                             'my_dict': {"type": "object"},
                             'my_float': {'type': 'number'},
                             'my_int': {'type': 'integer'},
-                            'my_str': {'type': ['string', 'null']}
+                            'my_str': {'type': 'string'}
                         },
                         'required': ['my_int',
                                      'my_str',
