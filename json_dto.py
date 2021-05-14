@@ -135,10 +135,10 @@ class JsonDto:
         types_map = {
             int: 'integer',
             float: 'number',
-            str: 'string',
+            str: ["string", "null"],
             bool: 'boolean',
-            datetime: 'string',
-            enum.Enum: 'string',
+            datetime: ["string", "null"],
+            enum.Enum: ["string", "null"],
             list: 'array',
             dict: 'object'
         }
