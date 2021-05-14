@@ -73,7 +73,9 @@ class JsonDto:
         result = {}
 
         for name, type_ in self.get_type_hints().items():
-            result[name] = self.serialize_value(getattr(self, name), type_)
+            value = self.serialize_value(getattr(self, name), type_)
+            if value is not None:
+                result[name] = self.serialize_value(getattr(self, name), type_)
 
         return result
 
@@ -135,10 +137,10 @@ class JsonDto:
         types_map = {
             int: 'integer',
             float: 'number',
-            str: ["string", "null"],
+            str: "string",
             bool: 'boolean',
-            datetime: ["string", "null"],
-            enum.Enum: ["string", "null"],
+            datetime: "string",
+            enum.Enum: "string",
             list: 'array',
             dict: 'object'
         }
